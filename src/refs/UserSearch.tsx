@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const users = [
   { name: 'Sarah', age: 22},
@@ -8,9 +8,19 @@ const users = [
 ];
 
 const UserSearch:React.FC = () => {
+  const inputRef = useRef<HTMLInputElement | null >(null);
+
+  const [ name, setName ] = useState<string>('');
+  const [ user, setUser ] = useState<{ name:string , age: number } | undefined>()
   
-  const [ name, setName ] = useState('');
-  const [ user, setUser ] = useState<{ name:string , age: number } | undefined >()
+  useEffect(() => {
+    if (!inputRef.current) {
+       return;
+    }
+    //this allow you to type in the input without clicking in it
+    inputRef.current.focus();
+  }, [])
+  
   const Click = () => {
     const userFound = users.find((user) => {
       if (user.name.toLocaleLowerCase() === name.toLocaleLowerCase()) {
@@ -20,14 +30,13 @@ const UserSearch:React.FC = () => {
     })
     
     setUser(userFound);
-
   }
   
   console.log(user, 'testing the user');
   
   return <div>
       User Search
-      <input type="text" value={name} onChange={e => setName(e.target.value)} />
+      <input type="text" ref={inputRef} value={name} onChange={e => setName(e.target.value)} />
       <button onClick={Click}>Find A User!</button>
       <div>
         <span>{user?.name ?? 'User not Found!'}</span><br/>
